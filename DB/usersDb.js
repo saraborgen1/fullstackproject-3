@@ -26,14 +26,12 @@ export class UsersDb {
 
  addUser(username, password, email, phone) {
     const users = this.getAll();
-
     const newUser = {
       username: username,
       password: password,
       email: email,
       phone: phone
     };
-
     users.push(newUser);
     this.saveAll(users);
     return newUser;

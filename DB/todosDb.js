@@ -1,5 +1,7 @@
-// js/DB/todosDb.js
+//DB/todosDb.js
+
 export class TodosDb {
+
   constructor() {
     this.storageKey = "db_todos";
   }
@@ -35,6 +37,7 @@ export class TodosDb {
   getAll() {
     const raw = localStorage.getItem(this.storageKey);
     if (!raw) return [];
+
     try {
       const todos = JSON.parse(raw);
       return Array.isArray(todos) ? todos : [];
@@ -60,15 +63,14 @@ export class TodosDb {
 
   getById(owner, id) {
     owner = String(owner ?? "").trim();
-    if (!owner) return null;
 
+    if (!owner) return null;
     if (!Number.isInteger(id) || id <= 0) return null;
 
     const todos = this.getAll();
     return todos.find(t => t.owner === owner && t.id === id) || null;
   }
 
-  // CHANGED: add(owner, title, dueDate)
   add(owner, title, dueDate) {
     owner = String(owner ?? "").trim();
     title = String(title ?? "").trim();
@@ -87,7 +89,6 @@ export class TodosDb {
 
     const todos = this.getAll();
     const nextId = todos.length === 0 ? 1 : Math.max(...todos.map(t => t.id)) + 1;
-
     const newTodo = {
       id: nextId,
       owner: owner,
@@ -95,26 +96,24 @@ export class TodosDb {
       done: false,
       dueDate: due
     };
-
     todos.push(newTodo);
     this.saveAll(todos);
-
     return newTodo;
   }
 
   toggle(owner, id) {
     owner = String(owner ?? "").trim();
-    if (!owner) return null;
 
+    if (!owner) return null;
     if (!Number.isInteger(id) || id <= 0) return null;
 
     const todos = this.getAll();
     const todo = todos.find(t => t.owner === owner && t.id === id);
+
     if (!todo) return null;
 
     todo.done = !todo.done;
     this.saveAll(todos);
-
     return todo;
   }
 
@@ -128,24 +127,24 @@ export class TodosDb {
 
     const todos = this.getAll();
     const todo = todos.find(t => t.owner === owner && t.id === id);
+
     if (!todo) return null;
 
     todo.title = newTitle;
     this.saveAll(todos);
-
     return todo;
   }
 
-  // CHANGED: update supports dueDate
   update(owner, id, patch) {
     owner = String(owner ?? "").trim();
+
     if (!owner) return null;
     if (!Number.isInteger(id) || id <= 0) return null;
 
     const todos = this.getAll();
     const todo = todos.find(t => t.owner === owner && t.id === id);
-    if (!todo) return null;
 
+    if (!todo) return null;
     if (patch && patch.title !== undefined) {
       const t = String(patch.title ?? "").trim();
       if (!t) throw new Error("title is required");
@@ -161,7 +160,6 @@ export class TodosDb {
 
     if (patch && patch.dueDate !== undefined) {
       const d = patch.dueDate;
-
       if (d === null || d === "") {
         todo.dueDate = null;
       } else {
@@ -179,47 +177,44 @@ export class TodosDb {
 
   remove(owner, id) {
     owner = String(owner ?? "").trim();
-    if (!owner) return false;
 
+    if (!owner) return false;
     if (!Number.isInteger(id) || id <= 0) return false;
 
     const todos = this.getAll();
     const before = todos.length;
-
     const afterTodos = todos.filter(t => !(t.owner === owner && t.id === id));
     this.saveAll(afterTodos);
-
     return afterTodos.length !== before;
   }
 
   clearByOwner(owner) {
     owner = String(owner ?? "").trim();
+
     if (!owner) return 0;
 
     const todos = this.getAll();
     const before = todos.length;
-
     const afterTodos = todos.filter(t => t.owner !== owner);
     this.saveAll(afterTodos);
-
     return before - afterTodos.length;
   }
 
   clearCompleted(owner) {
     owner = String(owner ?? "").trim();
+
     if (!owner) return 0;
 
     const todos = this.getAll();
     const before = todos.length;
-
     const afterTodos = todos.filter(t => !(t.owner === owner && t.done === true));
     this.saveAll(afterTodos);
-
     return before - afterTodos.length;
   }
 
   search(owner, query, done = undefined) {
     owner = String(owner ?? "").trim();
+
     if (!owner) return [];
 
     const q = String(query ?? "").trim().toLowerCase();

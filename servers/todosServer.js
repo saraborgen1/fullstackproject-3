@@ -1,4 +1,5 @@
-// js/servers/todosServer.js
+//servers/todosServer.js
+
 import { TodosDb } from "../DB/todosDb.js";
 
 export class TodosServer {
@@ -20,16 +21,13 @@ export class TodosServer {
       return { status: 400, data: { error: "Bad request" } };
     }
 
-   
     const [path, queryString = ""] = url.split("?");
     const parts = path.split("/").filter(Boolean); // e.g. "/todos/5/toggle" -> ["todos","5","toggle"]
-
    
     if (parts[0] !== "todos") {
       return { status: 404, data: { error: "Not found" } };
     }
 
-  
     const query = {};
     if (queryString) {
       const pairs = queryString.split("&");
@@ -42,7 +40,6 @@ export class TodosServer {
       }
     }
 
-   
     let id = null;
     if (parts.length >= 2) {
       const maybeId = Number(parts[1]);
@@ -71,7 +68,6 @@ export class TodosServer {
       return { status: 200, data: result };
     }
 
-
     if (method === "GET" && parts.length === 2) {
       if (!query.owner) return { status: 400, data: { error: "owner is required" } };
       if (id === null) return { status: 400, data: { error: "invalid id" } };
@@ -98,7 +94,6 @@ export class TodosServer {
       return { status: 200, data: updated };
     }
 
- 
     if (method === "PUT" && parts.length === 2) {
       if (id === null) return { status: 400, data: { error: "invalid id" } };
       if (!body.owner) return { status: 400, data: { error: "owner is required" } };
@@ -112,7 +107,6 @@ export class TodosServer {
       }
     }
 
-  
     if (method === "DELETE" && parts.length === 2) {
       if (id === null) return { status: 400, data: { error: "invalid id" } };
       if (!body.owner) return { status: 400, data: { error: "owner is required" } };

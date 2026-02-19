@@ -23,7 +23,6 @@ export function startRouter(root, network) {
     }
 
     renderLogin(root, network);
-    
   }
 
   window.addEventListener("hashchange", render);

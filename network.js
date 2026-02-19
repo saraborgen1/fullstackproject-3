@@ -1,10 +1,9 @@
-// js/network.js
+//network.js
 
 export class Network {
   constructor() {
     this.routes = [];
   }
-
 
   registerServer(prefix, serverInstance) {
     this.routes.push({ prefix, server: serverInstance });
@@ -34,7 +33,6 @@ export class Network {
     const dropRate = 0.1;
     // Random delay every request: 1000 - 3000 ms
     const delay = Math.floor(Math.random() * (3000 - 1000 + 1)) + 1000;
-
     const dropped = Math.random() < dropRate;
 
     setTimeout(() => {
@@ -52,9 +50,7 @@ export class Network {
       }
 
       try {
-        const server = route.server;
-
-     
+        const server = route.server;     
         let serverRes;
 
         if (typeof server.handle !== "function") {

@@ -2,7 +2,6 @@
 
 import { FXMLHttpRequest } from "../fajax.js";
 
-
 export function renderLogin(root, network) {
 
   root.innerHTML = `
@@ -29,7 +28,6 @@ export function renderLogin(root, network) {
   const errorBox = document.getElementById("login-error");
 
   loginBtn.addEventListener("click", () => {
-
     const username = usernameInput.value.trim();
     const password = passwordInput.value;
 
@@ -40,9 +38,7 @@ export function renderLogin(root, network) {
 
     errorBox.textContent = "";
     loginBtn.disabled = true;
-
     const xhr = new FXMLHttpRequest(network);
-
     xhr.open("POST", "/auth/login");
 
     xhr.onreadystatechange = function () {

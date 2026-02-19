@@ -1,4 +1,5 @@
-// js/servers/authServer.js
+//servers/authServer.js
+
 import { UsersDb } from "../DB/usersDb.js";
 
 export class AuthServer {
@@ -20,18 +21,15 @@ export class AuthServer {
       return { status: 400, data: { error: "Bad request" } };
     }
 
- 
     const [path, queryString = ""] = url.split("?");
-    const parts = path.split("/").filter(Boolean); // "/auth/login" -> ["auth","login"]
+    const parts = path.split("/").filter(Boolean); 
 
     if (parts[0] !== "auth") {
       return { status: 404, data: { error: "Not found" } };
     }
 
-
     const username = (body.username ?? "").toString().trim();
     const password = body.password;
-
 
     // POST /auth/register
     if (method === "POST" && parts.length === 2 && parts[1] === "register") {

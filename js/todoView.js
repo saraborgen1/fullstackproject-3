@@ -63,7 +63,6 @@ export function renderTodoApp(root, network) {
   const titleInput = document.getElementById("todoTitle");
   const listEl = document.getElementById("todoList");
   const errorBox = document.getElementById("errorBox");
-
   const searchBtn = document.getElementById("searchBtn");
   const searchInput = document.getElementById("searchInput");
   const filterSelect = document.getElementById("filterSelect");
@@ -75,51 +74,49 @@ export function renderTodoApp(root, network) {
   const tabAll = document.getElementById("tabAll");
   const tabDone = document.getElementById("tabDone");
 
-    let currentCategory = "all"; 
+  let currentCategory = "all"; 
 
-    function todayYYYYMMDD() {
+  function todayYYYYMMDD() {
     const d = new Date();
     const yyyy = d.getFullYear();
     const mm = String(d.getMonth() + 1).padStart(2, "0");
     const dd = String(d.getDate()).padStart(2, "0");
     return `${yyyy}-${mm}-${dd}`;
-    }
+  }
 
-    function isFuture(dateStr) {
+  function isFuture(dateStr) {
     // dateStr is YYYY-MM-DD
     const today = todayYYYYMMDD();
     return dateStr > today; // lexicographic works for YYYY-MM-DD
-    }
+  }
 
-    function applyCategoryFilter(todos) {
+  function applyCategoryFilter(todos) {
     const list = Array.isArray(todos) ? todos : [];
     const today = todayYYYYMMDD();
 
     switch (currentCategory) {
-        case "today":
+      case "today":
         return list.filter(t => !t.done && t.dueDate === today);
 
-        case "scheduled":
+      case "scheduled":
         return list.filter(t => !t.done && t.dueDate && isFuture(t.dueDate));
 
-        case "done":
+      case "done":
         return list.filter(t => t.done === true);
 
-        case "all":
+      case "all":
         default:
         return list;
     }
-}
+  }
 
-    function setActiveTab() {
-
+  function setActiveTab() {
     [tabToday, tabScheduled, tabAll, tabDone].forEach(b => b.classList.remove("active"));
     if (currentCategory === "today") tabToday.classList.add("active");
     else if (currentCategory === "scheduled") tabScheduled.classList.add("active");
     else if (currentCategory === "done") tabDone.classList.add("active");
     else tabAll.classList.add("active");
-    }
-
+  }
 
   logoutBtn.onclick = () => {
     localStorage.removeItem("currentUser");
@@ -180,8 +177,7 @@ export function renderTodoApp(root, network) {
       const due = document.createElement("small");
         if (t.dueDate) {
            due.textContent = ` (Due: ${t.dueDate})`;
-       }
-
+        }
 
       const editBtn = document.createElement("button");
       editBtn.textContent = "Edit";
@@ -200,15 +196,13 @@ export function renderTodoApp(root, network) {
       };
 
       // Edit
-    editBtn.onclick = () => {
+      editBtn.onclick = () => {
         const newTitleRaw = prompt("Edit title:", t.title);
         if (newTitleRaw === null) return;
         const newTitle = newTitleRaw.trim();
         if (!newTitle) return;
-
         const newDueRaw = prompt("Edit due date (YYYY-MM-DD) or empty to clear:", t.dueDate || "");
         if (newDueRaw === null) return;
-
         const dueDate = newDueRaw.trim() ? newDueRaw.trim() : null;
 
         sendRequest(
@@ -222,7 +216,7 @@ export function renderTodoApp(root, network) {
             },
             loadTodos
         );
-    };
+      };
 
       // Delete
       delBtn.onclick = () => {
@@ -239,8 +233,6 @@ export function renderTodoApp(root, network) {
       li.appendChild(due);
       li.appendChild(editBtn);
       li.appendChild(delBtn);
-      
-
       listEl.appendChild(li);
     });
   }
@@ -264,8 +256,6 @@ export function renderTodoApp(root, network) {
         loadTodos();
       }
     );
-   
-
   };
 
   // Search
@@ -284,9 +274,7 @@ export function renderTodoApp(root, network) {
   // Refresh
   refreshBtn.onclick = loadTodos;
 
-   
-clearDoneBtn.onclick = () => {
-   
+  clearDoneBtn.onclick = () => { 
     sendRequest("GET", `/todos?owner=${encodeURIComponent(currentUser)}`, null, (todos) => {
         const doneTodos = (todos || []).filter(t => t.done === true);
 
@@ -295,9 +283,7 @@ clearDoneBtn.onclick = () => {
         return;
         }
 
-        
         let i = 0;
-
         const deleteNext = () => {
         if (i >= doneTodos.length) {
             loadTodos();
@@ -309,33 +295,33 @@ clearDoneBtn.onclick = () => {
 
         sendRequest("DELETE", `/todos/${id}`, { owner: currentUser }, deleteNext);
         };
-
         deleteNext();
     });
-};
-tabToday.onclick = () => {
-  currentCategory = "today";
-  setActiveTab();
-  loadTodos();
-};
+  };
+  
+  tabToday.onclick = () => {
+    currentCategory = "today";
+    setActiveTab();
+    loadTodos();
+  };
 
-tabScheduled.onclick = () => {
-  currentCategory = "scheduled";
-  setActiveTab();
-  loadTodos();
-};
+  tabScheduled.onclick = () => {
+    currentCategory = "scheduled";
+    setActiveTab();
+    loadTodos();
+  };
 
-tabAll.onclick = () => {
-  currentCategory = "all";
-  setActiveTab();
-  loadTodos();
-};
+  tabAll.onclick = () => {
+    currentCategory = "all";
+    setActiveTab();
+    loadTodos();
+  };
 
-tabDone.onclick = () => {
-  currentCategory = "done";
-  setActiveTab();
-  loadTodos();
-};
+  tabDone.onclick = () => {
+    currentCategory = "done";
+    setActiveTab();
+    loadTodos();
+  };
 
   setActiveTab();
   loadTodos();
