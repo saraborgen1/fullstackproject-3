@@ -1,17 +1,16 @@
-// network.js
+// js/network.js
 
 export class Network {
   constructor() {
-    this.routes = []; 
+    this.routes = [];
   }
 
-// Registers a server instance to handle requests for a specific URL prefix
+
   registerServer(prefix, serverInstance) {
     this.routes.push({ prefix, server: serverInstance });
   }
 
   send(request, callback) {
-
     if (!request || typeof request !== "object") {
       throw new Error("request must be an object");
     }
@@ -25,47 +24,113 @@ export class Network {
       callback({
         ok: false,
         error: { code: "INVALID_INPUT", message: "Missing method or url" },
-        meta: requestId ? { requestId } : {}
+        meta: requestId !== undefined ? { requestId } : {}
       });
       return;
     }
 
-    const dropRate = Math.random() * (0.5 - 0.1) + 0.1;
+    // Random dropRate every request: 0.1 - 0.5
+    //const dropRate = Math.random() * (0.5 - 0.1) + 0.1;
+    const dropRate = 0.1;
+    // Random delay every request: 1000 - 3000 ms
     const delay = Math.floor(Math.random() * (3000 - 1000 + 1)) + 1000;
+
     const dropped = Math.random() < dropRate;
 
     setTimeout(() => {
-        
-      if (dropped) {
-        return;
-      }
+      // simulate drop: do nothing (FAJAX timeout should handle it)
+      if (dropped) return;
 
       const route = this.routes.find(r => url.startsWith(r.prefix));
-
       if (!route) {
         callback({
           ok: false,
           error: { code: "BAD_ROUTE", message: "No server for this url" },
-          meta: requestId ? { requestId } : {}
+          meta: requestId !== undefined ? { requestId } : {}
         });
         return;
       }
 
       try {
-        const response = route.server.handle(
-          method.toUpperCase(),
-          url,
-          body,
-          headers || {}
-        );
+        const server = route.server;
 
-        callback(response);
+     
+        let serverRes;
+
+        if (typeof server.handle !== "function") {
+          callback({
+            ok: false,
+            error: { code: "SERVER_ERROR", message: "Server has no handle()" },
+            meta: requestId !== undefined ? { requestId } : {}
+          });
+          return;
+        }
+
+        if (server.handle.length <= 1) {
+          // TodosServer style
+          serverRes = server.handle({
+            method: String(method).toUpperCase(),
+            url: String(url),
+            body: body || {},
+            headers: headers || {},
+            requestId
+          });
+        } else {
+          // AuthServer style
+          serverRes = server.handle(
+            String(method).toUpperCase(),
+            String(url),
+            body || {},
+            headers || {}
+          );
+        }
+
+      
+        if (serverRes && typeof serverRes === "object" && "ok" in serverRes) {
+          if (requestId !== undefined) {
+            if (!serverRes.meta) serverRes.meta = {};
+            if (serverRes.meta.requestId === undefined) serverRes.meta.requestId = requestId;
+          }
+          callback(serverRes);
+          return;
+        }
+
+        
+        if (serverRes && typeof serverRes === "object" && "status" in serverRes) {
+          const status = Number(serverRes.status);
+          const data = serverRes.data;
+
+          if (status >= 200 && status < 300) {
+            callback({
+              ok: true,
+              data: data,
+              meta: requestId !== undefined ? { requestId } : {}
+            });
+          } else {
+            callback({
+              ok: false,
+              error: {
+                code: String(status || "ERROR"),
+                message: (data && data.error) ? data.error : "Server error"
+              },
+              meta: requestId !== undefined ? { requestId } : {}
+            });
+          }
+          return;
+        }
+
+     
+        callback({
+          ok: false,
+          error: { code: "SERVER_ERROR", message: "Unknown server response format" },
+          meta: requestId !== undefined ? { requestId } : {}
+        });
 
       } catch (e) {
         callback({
           ok: false,
-          error: { code: "SERVER_ERROR", message: "Server crashed" },
-          meta: requestId ? { requestId } : {}
+          error: { code: "SERVER_ERROR", message: e?.message || "Server crashed" },
+          meta: requestId !== undefined ? { requestId } : {}
         });
       }
 

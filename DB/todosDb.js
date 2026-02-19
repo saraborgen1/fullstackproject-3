@@ -1,14 +1,12 @@
-// js/servers/todosDb.js
-
+// js/DB/todosDb.js
 export class TodosDb {
   constructor() {
     this.storageKey = "db_todos";
   }
 
- 
   isValidDb() {
     const raw = localStorage.getItem(this.storageKey);
-    if (!raw) return true; 
+    if (!raw) return true;
 
     let todos;
     try {
@@ -25,14 +23,14 @@ export class TodosDb {
         !Number.isInteger(t.id) ||
         typeof t.owner !== "string" ||
         typeof t.title !== "string" ||
-        typeof t.done !== "boolean"
+        typeof t.done !== "boolean" ||
+        (t.dueDate !== undefined && t.dueDate !== null && typeof t.dueDate !== "string")
       ) {
         return false;
       }
     }
     return true;
   }
-
 
   getAll() {
     const raw = localStorage.getItem(this.storageKey);
@@ -45,7 +43,6 @@ export class TodosDb {
     }
   }
 
- 
   saveAll(todos) {
     if (!Array.isArray(todos)) {
       throw new Error("todos must be an array");
@@ -53,7 +50,6 @@ export class TodosDb {
     localStorage.setItem(this.storageKey, JSON.stringify(todos));
   }
 
-  
   getByOwner(owner) {
     owner = String(owner ?? "").trim();
     if (!owner) return [];
@@ -62,7 +58,6 @@ export class TodosDb {
     return todos.filter(t => t.owner === owner);
   }
 
-  
   getById(owner, id) {
     owner = String(owner ?? "").trim();
     if (!owner) return null;
@@ -73,24 +68,32 @@ export class TodosDb {
     return todos.find(t => t.owner === owner && t.id === id) || null;
   }
 
- 
-  add(owner, title) {
+  // CHANGED: add(owner, title, dueDate)
+  add(owner, title, dueDate) {
     owner = String(owner ?? "").trim();
     title = String(title ?? "").trim();
 
     if (!owner) throw new Error("owner is required");
     if (!title) throw new Error("title is required");
 
-    const todos = this.getAll();
+    let due = null;
+    if (dueDate !== undefined && dueDate !== null && String(dueDate).trim() !== "") {
+      const s = String(dueDate).trim();
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+        throw new Error("dueDate must be YYYY-MM-DD");
+      }
+      due = s;
+    }
 
-    const nextId =
-      todos.length === 0 ? 1 : Math.max(...todos.map(t => t.id)) + 1;
+    const todos = this.getAll();
+    const nextId = todos.length === 0 ? 1 : Math.max(...todos.map(t => t.id)) + 1;
 
     const newTodo = {
       id: nextId,
       owner: owner,
       title: title,
-      done: false
+      done: false,
+      dueDate: due
     };
 
     todos.push(newTodo);
@@ -99,7 +102,6 @@ export class TodosDb {
     return newTodo;
   }
 
-  
   toggle(owner, id) {
     owner = String(owner ?? "").trim();
     if (!owner) return null;
@@ -115,7 +117,6 @@ export class TodosDb {
 
     return todo;
   }
-
 
   updateTitle(owner, id, newTitle) {
     owner = String(owner ?? "").trim();
@@ -135,7 +136,7 @@ export class TodosDb {
     return todo;
   }
 
-  
+  // CHANGED: update supports dueDate
   update(owner, id, patch) {
     owner = String(owner ?? "").trim();
     if (!owner) return null;
@@ -158,11 +159,24 @@ export class TodosDb {
       todo.done = patch.done;
     }
 
+    if (patch && patch.dueDate !== undefined) {
+      const d = patch.dueDate;
+
+      if (d === null || d === "") {
+        todo.dueDate = null;
+      } else {
+        const s = String(d).trim();
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+          throw new Error("dueDate must be YYYY-MM-DD");
+        }
+        todo.dueDate = s;
+      }
+    }
+
     this.saveAll(todos);
     return todo;
   }
 
- 
   remove(owner, id) {
     owner = String(owner ?? "").trim();
     if (!owner) return false;
@@ -178,7 +192,6 @@ export class TodosDb {
     return afterTodos.length !== before;
   }
 
-
   clearByOwner(owner) {
     owner = String(owner ?? "").trim();
     if (!owner) return 0;
@@ -191,7 +204,6 @@ export class TodosDb {
 
     return before - afterTodos.length;
   }
-
 
   clearCompleted(owner) {
     owner = String(owner ?? "").trim();
@@ -206,13 +218,11 @@ export class TodosDb {
     return before - afterTodos.length;
   }
 
- 
   search(owner, query, done = undefined) {
     owner = String(owner ?? "").trim();
     if (!owner) return [];
 
     const q = String(query ?? "").trim().toLowerCase();
-
     let list = this.getByOwner(owner);
 
     if (q) {

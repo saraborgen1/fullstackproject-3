@@ -56,17 +56,6 @@ export class TodosServer {
     if (method === "GET" && parts.length === 1) {
       return { status: 200, data: this.db.getAll() };
     }
-
-    if (method === "GET" && parts.length === 2) {
-      if (!query.owner) return { status: 400, data: { error: "owner is required" } };
-      if (id === null) return { status: 400, data: { error: "invalid id" } };
-
-      const todo = this.db.getById(query.owner, id);
-      if (!todo) return { status: 404, data: { error: "todo not found" } };
-      return { status: 200, data: todo };
-    }
-
-   
     if (method === "GET" && parts.length === 2 && parts[1] === "search") {
       if (!query.owner) return { status: 400, data: { error: "owner is required" } };
 
@@ -82,17 +71,24 @@ export class TodosServer {
       return { status: 200, data: result };
     }
 
- 
+
+    if (method === "GET" && parts.length === 2) {
+      if (!query.owner) return { status: 400, data: { error: "owner is required" } };
+      if (id === null) return { status: 400, data: { error: "invalid id" } };
+
+      const todo = this.db.getById(query.owner, id);
+      if (!todo) return { status: 404, data: { error: "todo not found" } };
+      return { status: 200, data: todo };
+    }
     if (method === "POST" && parts.length === 1) {
       try {
-        const created = this.db.add(body.owner, body.title);
+        const created = this.db.add(body.owner, body.title, body.dueDate);
+
         return { status: 201, data: created };
       } catch (e) {
         return { status: 400, data: { error: e.message || "bad input" } };
       }
     }
-
- 
     if (method === "PUT" && parts.length === 3 && parts[2] === "toggle") {
       if (id === null) return { status: 400, data: { error: "invalid id" } };
       if (!body.owner) return { status: 400, data: { error: "owner is required" } };
@@ -108,7 +104,7 @@ export class TodosServer {
       if (!body.owner) return { status: 400, data: { error: "owner is required" } };
 
       try {
-        const updated = this.db.update(body.owner, id, { title: body.title, done: body.done });
+        const updated = this.db.update(body.owner, id, { title: body.title, done: body.done, dueDate: body.dueDate });
         if (!updated) return { status: 404, data: { error: "todo not found" } };
         return { status: 200, data: updated };
       } catch (e) {
