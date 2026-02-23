@@ -40,6 +40,20 @@ export class AuthServer {
         return { status: 400, data: { error: "Missing username, password, email or phone", code: "INVALID_INPUT" } };
       }
 
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return { status: 400, data: { error: "Invalid email format", code: "INVALID_EMAIL" } };
+      }
+
+      const phoneRegex = /^\d{9,10}$/;
+      if (!phoneRegex.test(phone)) {
+        return { status: 400, data: { error: "Invalid phone number", code: "INVALID_PHONE" } };
+      }
+
+      if (String(password).length < 6) {
+        return { status: 400, data: { error: "Password must be at least 6 characters", code: "WEAK_PASSWORD" } };
+      }
+
       if (this.db.findByUsername(username)) {
         return { status: 409, data: { error: "User already exists", code: "USER_EXISTS" } };
       }

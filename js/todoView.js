@@ -11,51 +11,54 @@ export function renderTodoApp(root, network) {
   }
 
   root.innerHTML = `
-    <div class="todo-container">
-      <h2>Todo App</h2>
+    <div class="todo-page">
+      <div class="todo-card">
 
-      <div>
-        <span>Hello, ${currentUser}</span>
-        <button id="logoutBtn">Logout</button>
+        <div class="todo-header">
+          <div>
+            <h2 class="todo-title">My Reminders</h2>
+            <p class="todo-sub">Hello, ${currentUser}</p>
+          </div>
+            <button id="logoutBtn" class="todo-btn ghost">Logout</button>
+        </div>
+
+        <div class="todo-layout">
+          <div class="todo-categories">
+            <button id="tabToday" class="cat cat-today">Today</button>
+            <button id="tabScheduled" class="cat cat-scheduled">Scheduled</button>
+            <button id="tabAll" class="cat cat-all active">All</button>
+            <button id="tabDone" class="cat cat-done">Completed</button>
+          </div>
+
+          <div class="todo-content">
+            <div class="todo-add">
+              <input id="todoTitle" class="todo-input" placeholder="New task..." />
+              <input id="todoDueDate" class="todo-input" type="date" />
+              <button id="addBtn" class="todo-btn primary">Add</button>
+            </div>
+          
+            <div class="todo-tools">
+              <input id="searchInput" class="todo-input" placeholder="Search..." />
+              <select id="filterSelect" class="todo-input">
+                <option value="">All</option>
+                <option value="true">Done</option>
+                <option value="false">Not Done</option>
+              </select>
+              <button id="searchBtn" class="todo-btn">Search</button>
+              <button id="refreshBtn" class="todo-btn">Refresh</button>
+            </div>
+
+            <div class="todo-actions">
+              <button id="clearDoneBtn" class="todo-btn danger">Clear Completed</button>
+            </div>
+
+            <p id="errorBox" class="todo-msg"></p>
+            <ul id="todoList" class="todo-list"></ul>
+        </div>
+
       </div>
-
-      <hr/>
-
-      <div>
-        <input id="todoTitle" placeholder="New task..." />
-        <input id="todoDueDate" type="date" />
-        <button id="addBtn">Add</button>
-      </div>
-
-      <hr/>
-
-      <div>
-        <input id="searchInput" placeholder="Search..." />
-        <select id="filterSelect">
-          <option value="">All</option>
-          <option value="true">Done</option>
-          <option value="false">Not Done</option>
-        </select>
-        <button id="searchBtn">Search</button>
-        <button id="refreshBtn">Refresh</button>
-      </div>
-
-      <hr/>
-
-      <div>
-        <button id="clearDoneBtn">Clear Completed</button>
-      </div>
-
-      <p id="errorBox" style="color:red;"></p>
-      <ul id="todoList"></ul>
-     <div style="margin: 8px 0;">
-        <button id="tabToday">Today</button>
-        <button id="tabScheduled">Scheduled</button>
-        <button id="tabAll" class="active">All</button>
-        <button id="tabDone">Completed</button>
-     </div>
-
     </div>
+  </div>
   `;
 
   const logoutBtn = document.getElementById("logoutBtn");
@@ -84,10 +87,11 @@ export function renderTodoApp(root, network) {
     return `${yyyy}-${mm}-${dd}`;
   }
 
+  dueDateInput.min = todayYYYYMMDD();
+
   function isFuture(dateStr) {
-    // dateStr is YYYY-MM-DD
     const today = todayYYYYMMDD();
-    return dateStr > today; // lexicographic works for YYYY-MM-DD
+    return dateStr > today; 
   }
 
   function applyCategoryFilter(todos) {
@@ -123,8 +127,19 @@ export function renderTodoApp(root, network) {
     window.location.hash = "#/login";
   };
 
-  function showError(msg) {
+  let msgTimer = null;
+
+  function showMessage(msg, type = "error") {
     errorBox.textContent = msg || "";
+    errorBox.className = type === "success" ? "todo-msg success" : "todo-msg error";
+
+    if (msgTimer) clearTimeout(msgTimer);
+    if (msg) {
+      msgTimer = setTimeout(() => {
+        errorBox.textContent = "";
+        errorBox.className = "todo-msg";
+      }, 1800);
+    }
   }
 
   function sendRequest(method, url, body, onSuccess) {
@@ -134,9 +149,8 @@ export function renderTodoApp(root, network) {
     xhr.onreadystatechange = function () {
       if (xhr.readyState === 4) {
         if (!xhr.response.ok) {
-          showError(xhr.response.error?.message || "Server error");
+          showMessage(xhr.response?.error?.message || xhr.response?.error || "Server error", "error");
         } else {
-          showError("");
           if (onSuccess) onSuccess(xhr.response.data);
         }
       }
@@ -159,31 +173,56 @@ export function renderTodoApp(root, network) {
     listEl.innerHTML = "";
 
     if (!todos || todos.length === 0) {
-      listEl.innerHTML = "<li>No tasks yet</li>";
+      listEl.innerHTML = `<li class="todo-empty">No tasks yet</li>`;
       return;
     }
 
     todos.forEach(t => {
       const li = document.createElement("li");
+      li.className = "todo-item" + (t.done ? " is-done" : "");
+
+      const left = document.createElement("div");
+      left.className = "todo-left";
 
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
       checkbox.checked = t.done;
+      checkbox.className = "todo-check";
 
-      const span = document.createElement("span");
-      span.textContent = t.title;
-      if (t.done) span.style.textDecoration = "line-through";
+      const textWrap = document.createElement("div");
+      textWrap.className = "todo-text";
       
-      const due = document.createElement("small");
-        if (t.dueDate) {
-           due.textContent = ` (Due: ${t.dueDate})`;
-        }
+      const title = document.createElement("div");
+      title.className = "todo-item-title";
+      title.textContent = t.title;
+
+      const meta = document.createElement("div");
+      meta.className = "todo-meta";
+
+      const due = document.createElement("span");
+      due.className = "todo-due";
+      due.textContent = t.dueDate ? `Due: ${t.dueDate}` : "No due date";
+
+      meta.appendChild(due);
+      textWrap.appendChild(title);
+      textWrap.appendChild(meta);
+
+      left.appendChild(checkbox);
+      left.appendChild(textWrap);
+
+      const actions = document.createElement("div");
+      actions.className = "todo-actions-row";
 
       const editBtn = document.createElement("button");
+      editBtn.className = "todo-btn small";
       editBtn.textContent = "Edit";
 
       const delBtn = document.createElement("button");
+      delBtn.className = "todo-btn small danger";
       delBtn.textContent = "Delete";
+
+      actions.appendChild(editBtn);
+      actions.appendChild(delBtn);
 
       // Toggle
       checkbox.onchange = () => {
@@ -203,7 +242,29 @@ export function renderTodoApp(root, network) {
         if (!newTitle) return;
         const newDueRaw = prompt("Edit due date (YYYY-MM-DD) or empty to clear:", t.dueDate || "");
         if (newDueRaw === null) return;
-        const dueDate = newDueRaw.trim() ? newDueRaw.trim() : null;
+
+        let dueDate = null;
+        const trimmed = newDueRaw.trim();
+
+        if (trimmed) {
+          const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+
+          // בדיקת פורמט
+          if (!dateRegex.test(trimmed)) {
+            showMessage("Due date must be in format YYYY-MM-DD", "error");
+            return;
+          }
+
+          const today = todayYYYYMMDD();
+
+          // בדיקה שהתאריך אינו בעבר (היום מותר)
+          if (trimmed < today) {
+            showMessage("Due date cannot be in the past", "error");
+            return;
+          }
+
+          dueDate = trimmed;
+        }
 
         sendRequest(
             "PUT",
@@ -228,11 +289,8 @@ export function renderTodoApp(root, network) {
         );
       };
 
-      li.appendChild(checkbox);
-      li.appendChild(span);
-      li.appendChild(due);
-      li.appendChild(editBtn);
-      li.appendChild(delBtn);
+      li.appendChild(left);
+      li.appendChild(actions);
       listEl.appendChild(li);
     });
   }
@@ -240,11 +298,18 @@ export function renderTodoApp(root, network) {
   // Add
   addBtn.onclick = () => {
     const title = titleInput.value.trim();
-    const dueDate = dueDateInput.value; 
+    const dueDate = dueDateInput.value;
+
     if (!title) {
-      showError("Please enter a title");
+      showMessage("Please enter a title", "error");
       return;
     }
+
+    if (dueDate && dueDate < todayYYYYMMDD()) {
+      showMessage("Due date cannot be in the past", "error");
+      return;
+    }
+
 
     sendRequest(
       "POST",
@@ -253,6 +318,7 @@ export function renderTodoApp(root, network) {
       () => {
         titleInput.value = "";
         dueDateInput.value = "";
+        showMessage("Task added successfully", "success");
         loadTodos();
       }
     );
@@ -264,22 +330,36 @@ export function renderTodoApp(root, network) {
     const done = filterSelect.value;
 
     let url = `/todos/search?owner=${encodeURIComponent(currentUser)}`;
-
     if (q) url += `&q=${encodeURIComponent(q)}`;
     if (done !== "") url += `&done=${done}`;
 
-    sendRequest("GET", url, null, renderList);
+    sendRequest("GET", url, null, (todos) => {
+      const filtered = applyCategoryFilter(todos);
+
+      if (!filtered || filtered.length === 0) {
+        showMessage("No results found", "error");
+      } else {
+        showMessage("", "success");
+      }
+
+      renderList(filtered);
+    });
   };
 
   // Refresh
-  refreshBtn.onclick = loadTodos;
-
+  refreshBtn.onclick = () => {
+    searchInput.value = "";
+    filterSelect.value = "";
+    showMessage("", "success");
+    loadTodos();
+  };
+  
   clearDoneBtn.onclick = () => { 
     sendRequest("GET", `/todos?owner=${encodeURIComponent(currentUser)}`, null, (todos) => {
         const doneTodos = (todos || []).filter(t => t.done === true);
 
         if (doneTodos.length === 0) {
-        showError("No completed tasks to clear");
+        showMessage("No completed tasks to clear", "error");
         return;
         }
 

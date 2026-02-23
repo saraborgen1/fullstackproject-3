@@ -40,12 +40,6 @@ export class TodosServer {
       }
     }
 
-    let id = null;
-    if (parts.length >= 2) {
-      const maybeId = Number(parts[1]);
-      if (Number.isInteger(maybeId) && maybeId > 0) id = maybeId;
-    }
-
     if (method === "GET" && parts.length === 1 && query.owner) {
       return { status: 200, data: this.db.getByOwner(query.owner) };
     } 
@@ -53,6 +47,7 @@ export class TodosServer {
     if (method === "GET" && parts.length === 1) {
       return { status: 200, data: this.db.getAll() };
     }
+
     if (method === "GET" && parts.length === 2 && parts[1] === "search") {
       if (!query.owner) return { status: 400, data: { error: "owner is required" } };
 
@@ -66,6 +61,12 @@ export class TodosServer {
       const q = query.q || "";
       const result = this.db.search(query.owner, q, done);
       return { status: 200, data: result };
+    }
+
+    let id = null;
+    if (parts.length >= 2) {
+      const maybeId = Number(parts[1]);
+      if (Number.isInteger(maybeId) && maybeId > 0) id = maybeId;
     }
 
     if (method === "GET" && parts.length === 2) {

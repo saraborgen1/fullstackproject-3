@@ -6,21 +6,26 @@ export function renderRegister(root, network) {
 
   root.innerHTML = `
     <div class="auth-container">
-      <h2>Register</h2>
+      <div class="auth-card">
+        <h2 class="auth-title">My Reminders</h2>
+        <p class="auth-subtitle">Register to continue</p>
 
-      <input id="reg-username" placeholder="Username" />
-      <input id="reg-password" type="password" placeholder="Password" />
-      <input id="reg-email" placeholder="Email" />
-      <input id="reg-phone" placeholder="Phone" />
+        <div class="auth-form">
+          <input class="auth-field" id="reg-username" placeholder="Username" />
+          <input class="auth-field" id="reg-password" type="password" placeholder="Password" />
+          <input class="auth-field" id="reg-email" placeholder="Email" />
+          <input class="auth-field" id="reg-phone" placeholder="Phone" />
 
-      <button id="reg-btn">Create Account</button>
+          <button class="auth-btn" id="reg-btn">Create Account</button>
 
-      <p id="reg-error" class="error"></p>
+          <p id="reg-error" class="error"></p>
 
-      <p>
-        Already have an account?
-        <a href="#/login">Login</a>
-      </p>
+          <p class="auth-footer">
+            Already have an account?
+            <a href="#/login">Login</a>
+          </p>
+        </div>
+      </div>
     </div>
   `;
 
@@ -31,6 +36,20 @@ export function renderRegister(root, network) {
   const regBtn = document.getElementById("reg-btn");
   const errorBox = document.getElementById("reg-error");
 
+  function validateRegisterInputs() {
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value;
+    const email = emailInput.value.trim();
+    const phone = phoneInput.value.trim();
+    const isInvalid = !username || !password || !email || !phone;
+    regBtn.disabled = isInvalid;
+  }
+  usernameInput.addEventListener("input", validateRegisterInputs);
+  passwordInput.addEventListener("input", validateRegisterInputs);
+  emailInput.addEventListener("input", validateRegisterInputs);
+  phoneInput.addEventListener("input", validateRegisterInputs);
+  validateRegisterInputs();
+
   regBtn.addEventListener("click", () => {
     const username = usernameInput.value.trim();
     const password = passwordInput.value;
@@ -39,6 +58,23 @@ export function renderRegister(root, network) {
 
     if (!username || !password || !email || !phone) {
       errorBox.textContent = "Please fill all fields";
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      errorBox.textContent = "Invalid email format";
+      return;
+    }
+
+    const phoneRegex = /^\d{9,10}$/;
+    if (!phoneRegex.test(phone)) {
+      errorBox.textContent = "Phone must contain 9-10 digits";
+      return;
+    }
+
+    if (password.length < 6) {
+      errorBox.textContent = "Password must be at least 6 characters";
       return;
     }
 
@@ -54,7 +90,7 @@ export function renderRegister(root, network) {
         if (xhr.response.ok) {
           window.location.hash = "#/login";
         } else {
-          errorBox.textContent = xhr.response.error.message;
+          errorBox.textContent = xhr.response?.error?.message || xhr.response?.error || "Registration failed";        
         }
       }
     };

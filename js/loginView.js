@@ -6,19 +6,26 @@ export function renderLogin(root, network) {
 
   root.innerHTML = `
     <div class="auth-container">
-      <h2>Login</h2>
+      <div class="auth-card">
 
-      <input id="login-username" placeholder="Username" />
-      <input id="login-password" type="password" placeholder="Password" />
+        <h2 class="auth-title">My Reminders</h2>
+        <p class="auth-subtitle">Login to continue</p>
 
-      <button id="login-btn">Login</button>
+        <div class="auth-form">
+          <input class="auth-field" id="login-username" placeholder="Username" />
+          <input class="auth-field" id="login-password" type="password" placeholder="Password" />
 
-      <p id="login-error" class="error"></p>
+          <button class="auth-btn" id="login-btn">Login</button>
 
-      <p>
-        Don't have an account?
-        <a href="#/register">Register</a>
-      </p>
+          <p id="login-error" class="error"></p>
+
+          <p class="auth-footer">
+            Don't have an account?
+            <a href="#/register">Register</a>
+          </p>
+
+        </div>
+      </div>
     </div>
   `;
 
@@ -26,6 +33,26 @@ export function renderLogin(root, network) {
   const passwordInput = document.getElementById("login-password");
   const loginBtn = document.getElementById("login-btn");
   const errorBox = document.getElementById("login-error");
+
+  function validateInputs() {
+    const isInvalid = !usernameInput.value.trim() || !passwordInput.value.trim();
+    loginBtn.disabled = isInvalid;
+  }
+  usernameInput.addEventListener("input", validateInputs);
+  passwordInput.addEventListener("input", validateInputs);
+  validateInputs();
+
+  usernameInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      loginBtn.click();
+    }
+  });
+
+  passwordInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      loginBtn.click();
+    }
+  });
 
   loginBtn.addEventListener("click", () => {
     const username = usernameInput.value.trim();
@@ -50,7 +77,7 @@ export function renderLogin(root, network) {
           window.location.hash = "#/app";
 
         } else {
-          errorBox.textContent = xhr.response.error.message;
+        errorBox.textContent =xhr.response?.error?.message || xhr.response?.error || "Login failed";        
         }
       }
     };

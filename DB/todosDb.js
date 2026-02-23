@@ -6,6 +6,14 @@ export class TodosDb {
     this.storageKey = "db_todos";
   }
 
+  todayYYYYMMDD() {
+    const d = new Date();
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
   isValidDb() {
     const raw = localStorage.getItem(this.storageKey);
     if (!raw) return true;
@@ -83,6 +91,11 @@ export class TodosDb {
       const s = String(dueDate).trim();
       if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) {
         throw new Error("dueDate must be YYYY-MM-DD");
+      }
+
+      const today = this.todayYYYYMMDD();
+      if (s < today) {
+        throw new Error("dueDate cannot be in the past");
       }
       due = s;
     }
@@ -164,9 +177,15 @@ export class TodosDb {
         todo.dueDate = null;
       } else {
         const s = String(d).trim();
-        if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+       if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) {
           throw new Error("dueDate must be YYYY-MM-DD");
         }
+
+        const today = this.todayYYYYMMDD();
+        if (s < today) {
+          throw new Error("dueDate cannot be in the past");
+        }
+        
         todo.dueDate = s;
       }
     }

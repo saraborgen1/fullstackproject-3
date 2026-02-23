@@ -1,0 +1,79 @@
+/*כרטיסיה באמצע*/
+.auth-card{
+  max-width: 460px;
+  padding: 22px 18px;
+}
+
+/*כותרת ראשית*/
+.auth-title{
+  line-height: 1.2;
+  text-align: center;
+}
+
+/*כותרת משנית*/
+.auth-subtitle{
+  margin: 0 0 18px 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/*עיצוב בסיסי לכרטיסיה*/
+.auth-form{
+  display: flex;
+  flex-direction: column;
+  gap: 10px; 
+}
+
+.auth-field{
+  width: 100%;
+  display: block;           
+  box-sizing: border-box;   
+  padding: 12px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  outline: none;
+  font-size: 15px;
+  color: var(--text);
+  background: var(--card);
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+/*אפקט פוקוס לשדות הקלט*/
+.auth-field:focus{
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 4px rgba(42, 167, 255, 0.18);
+}
+
+/*עיצוב כפתור ההתחברות והרישום*/
+.auth-btn{
+  padding: 12px 14px;
+  border: none;
+  background: var(--primary);
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.auth-btn:hover{ background: var(--primary2); transform: translateY(-1px); }
+.auth-btn:disabled{ opacity: 0.6; cursor: not-allowed; transform: none; }
+
+.error{
+  text-align: center;
+}
+
+/*טקסט תחתון*/
+.auth-footer{
+  margin-top: 14px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/*קישורים בטקסט התחתון*/
+.auth-footer a{
+  color: var(--primary2);
+  text-decoration: none;
+  font-weight: 700;
+}
+.auth-footer a:hover{ text-decoration: underline; }

@@ -1,0 +1,275 @@
+/*הכרטיסיה באמצע*/
+.todo-card{
+  max-width: 980px;
+  padding: 18px;
+}
+
+.todo-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 12px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+/*השם של המשתמש*/
+.todo-sub{
+  margin: 4px 0 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/*הכרטיסיה הפנימית*/
+.todo-layout{
+  display:grid;
+  grid-template-columns: 220px 1fr;
+  gap: 14px;
+  padding-top: 14px;
+}
+
+.todo-categories, .todo-content{
+  display:flex;
+  flex-direction:column;
+  gap: 10px;
+}
+
+/*החלוקות האפשריות*/
+.cat{
+  padding: 14px 12px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  text-align:left;
+  font-weight: 800;
+}
+
+.cat:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
+}
+
+.cat.active{
+  outline: 3px solid rgba(42,167,255,0.22);
+  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.10);
+}
+
+.cat-today{ border-left: 10px solid var(--cat1); }
+.cat-scheduled{ border-left: 10px solid var(--cat2); }
+.cat-all{ border-left: 10px solid var(--cat3); }
+.cat-done{ border-left: 10px solid var(--cat4); }
+
+/*החלק הימני של הכרטיסיה*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.todo-add, .todo-tools{
+  display:grid;
+  grid-template-columns: 1fr 170px 120px;
+  gap: 10px;
+}
+
+.todo-tools{
+  grid-template-columns: 1fr 140px 120px 120px;
+}
+
+.todo-actions{
+  display:flex;
+  justify-content:flex-end;
+}
+
+.todo-input{
+  width:100%;
+  box-sizing:border-box;
+  padding: 12px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  outline:none;
+  font-size: 15px;
+  color: var(--text);
+}
+
+.todo-input:focus{
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 4px rgba(42, 167, 255, 0.18);
+}
+
+.todo-btn{
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  cursor:pointer;
+  font-weight: 800;
+  transition: all 0.2s ease;
+}
+
+.todo-btn:hover {
+  background-color: #f8fafc;
+  border-color: #94a3b8;
+  transform: translateY(-1px);
+}
+
+.todo-btn.primary{
+  background: var(--primary);
+  border-color: transparent;
+  color:#fff;
+}
+
+.todo-btn.primary:hover{ background: var(--primary2); }
+
+.todo-btn.danger{
+  background: #fff;
+  border-color: rgba(239,68,68,0.35);
+  color: var(--danger);
+}
+
+.todo-btn.ghost{
+  background: transparent;
+}
+
+.todo-list{
+  list-style:none;
+  padding: 0;
+  margin: 0;
+  display:flex;
+  flex-direction:column;
+  gap: 10px;
+}
+
+.todo-msg{
+  margin: 0;
+  min-height: 18px;
+  font-size: 13px;
+}
+
+.todo-msg.error{ color: var(--danger); }
+.todo-msg.success{ color: #16a34a; }
+
+.todo-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 12px;
+  padding: 12px 12px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.06);
+}
+
+.todo-item.is-done{
+  opacity: 0.75;
+}
+
+.todo-left{
+  display:flex;
+  align-items:flex-start;
+  gap: 10px;
+  min-width: 0;
+}
+
+.todo-check{
+  margin-top: 3px;
+  transform: scale(1.05);
+}
+
+.todo-text{
+  display:flex;
+  flex-direction:column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.todo-item-title{
+  font-weight: 800;
+  color: var(--text);
+  word-break: break-word;
+}
+
+.todo-item.is-done .todo-item-title{
+  text-decoration: line-through;
+}
+
+.todo-meta{
+  display:flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.todo-due{
+  font-size: 12px;
+  color: var(--muted);
+  background: #f1f5f9;
+  border: 1px solid var(--border);
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+
+.todo-actions-row{
+  display:flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.todo-btn.small{
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.todo-btn.small.danger{
+  border-color: rgba(239,68,68,0.35);
+  color: var(--danger);
+}
+
+.todo-empty{
+  padding: 14px;
+  border: 1px dashed var(--border);
+  border-radius: 14px;
+  color: var(--muted);
+  text-align:center;
+}
+
+/* Responsive */
+@media (max-width: 900px){
+  .todo-layout{
+    grid-template-columns: 1fr;
+  }
+
+  .todo-categories{
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .cat{
+    flex: 1 1 160px;
+  }
+
+  .todo-add{
+    grid-template-columns: 1fr;
+  }
+
+  .todo-tools{
+    grid-template-columns: 1fr;
+  }
+
+  .todo-actions{
+    justify-content: stretch;
+  }
+
+  .todo-btn{
+    width: 100%;
+  }
+}

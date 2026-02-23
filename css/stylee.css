@@ -1,0 +1,60 @@
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+
+:root{
+  --bg1:#eaf6ff;
+  --bg2:#f7fbff;
+  --card:#ffffff;
+  --border:#dbeafe;
+  --text:#0f172a;
+  --muted:#64748b;
+  --primary:#2aa7ff;
+  --primary2:#1d8fe0;
+  --danger:#ef4444;
+  --cat1:#38bdf8;  /* today */
+  --cat2:#a78bfa;  /* scheduled */
+  --cat3:#22c55e;  /* all */
+  --cat4:#f59e0b;  /* done */
+}
+
+.todo-page, .auth-container{
+  height: 100vh;
+  box-sizing: border-box;
+  padding: 24px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:
+    radial-gradient(1200px 600px at 20% 10%, var(--bg1), transparent),
+    radial-gradient(900px 500px at 80% 30%, #d9f0ff, transparent),
+    linear-gradient(180deg, var(--bg2), #ffffff);
+}
+
+.auth-card, .todo-card{
+  width: 100%;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: 0 14px 40px rgba(15, 23, 42, 0.10);
+}
+
+.todo-title, .auth-title{
+  margin:0 0 6px 0;
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.cat, .auth-btn{
+  width:100%;
+  border-radius: 14px;
+  cursor:pointer;
+  transition: transform 120ms ease, box-shadow 160ms ease, opacity 160ms ease;
+}
+
+.todo-error, .error{
+  margin: 0;
+  min-height: 18px;
+  color: var(--danger);
+  font-size: 13px;
+}
