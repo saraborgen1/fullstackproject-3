@@ -59,35 +59,31 @@
 .cat-done{ border-left: 10px solid var(--cat4); }
 
 /*החלק הימני של הכרטיסיה*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 .todo-add, .todo-tools{
   display:grid;
   grid-template-columns: 1fr 170px 120px;
   gap: 10px;
 }
 
+/*מחלק את השורה ל4*/
 .todo-tools{
   grid-template-columns: 1fr 140px 120px 120px;
 }
 
+ /*Clear Completed*/
 .todo-actions{
   display:flex;
-  justify-content:flex-end;
+  justify-content:center;
 }
 
+/*שלא יראה רשימת משימות*/
+.todo-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+/*עיצוב כללי של שדות הקלט*/
 .todo-input{
   width:100%;
   box-sizing:border-box;
@@ -99,11 +95,7 @@
   color: var(--text);
 }
 
-.todo-input:focus{
-  border-color: #93c5fd;
-  box-shadow: 0 0 0 4px rgba(42, 167, 255, 0.18);
-}
-
+/*עיצוב כללי של כפתורים*/
 .todo-btn{
   padding: 12px 14px;
   border-radius: 12px;
@@ -114,22 +106,23 @@
   transition: all 0.2s ease;
 }
 
+/*אפקט ריחוף כללי של כפתורים*/
 .todo-btn:hover {
   background-color: #f8fafc;
   border-color: #94a3b8;
   transform: translateY(-1px);
 }
 
+/*כפתור ההוספה*/
 .todo-btn.primary{
   background: var(--primary);
   border-color: transparent;
-  color:#fff;
+  color: var(--card);
 }
-
 .todo-btn.primary:hover{ background: var(--primary2); }
 
 .todo-btn.danger{
-  background: #fff;
+  background: var(--card);
   border-color: rgba(239,68,68,0.35);
   color: var(--danger);
 }
@@ -138,14 +131,16 @@
   background: transparent;
 }
 
+/*רווח בין השורות*/
 .todo-list{
-  list-style:none;
-  padding: 0;
-  margin: 0;
   display:flex;
   flex-direction:column;
   gap: 10px;
 }
+
+/*הודעות שגיאה והצלחה*/
+.todo-msg.error{ color: var(--danger); }
+.todo-msg.success{ color: #16a34a; }
 
 .todo-msg{
   margin: 0;
@@ -153,9 +148,7 @@
   font-size: 13px;
 }
 
-.todo-msg.error{ color: var(--danger); }
-.todo-msg.success{ color: #16a34a; }
-
+/*פריט משימה*/
 .todo-item{
   display:flex;
   align-items:center;
@@ -172,6 +165,7 @@
   opacity: 0.75;
 }
 
+/*שורת משימה*/
 .todo-left{
   display:flex;
   align-items:flex-start;
@@ -179,34 +173,36 @@
   min-width: 0;
 }
 
+/*הבוצע של המשימה*/
 .todo-check{
   margin-top: 3px;
   transform: scale(1.05);
+  cursor: pointer;
 }
 
-.todo-text{
-  display:flex;
-  flex-direction:column;
-  gap: 4px;
-  min-width: 0;
-}
-
+/*התוכן של המשימה*/
 .todo-item-title{
   font-weight: 800;
   color: var(--text);
   word-break: break-word;
 }
 
+/*כאשר המשימה בוצעה, הטקסט שלה מקווקו*/
 .todo-item.is-done .todo-item-title{
   text-decoration: line-through;
 }
 
-.todo-meta{
-  display:flex;
-  gap: 8px;
-  flex-wrap: wrap;
+/*לוח שנה של עריכה*/
+#todoDueDate {
+  cursor: text;
 }
 
+/*לוח שנה לחיץ*/
+#todoDueDate::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+}
+
+/*תאריך היעד של המשימה*/
 .todo-due{
   font-size: 12px;
   color: var(--muted);
@@ -216,12 +212,14 @@
   border-radius: 999px;
 }
 
+/*שורת הכפתורים של כל משימה*/
 .todo-actions-row{
   display:flex;
   gap: 8px;
   flex-shrink: 0;
 }
 
+/*כפתור העריכה והמחיקה של משימה*/
 .todo-btn.small{
   padding: 8px 10px;
   border-radius: 10px;
@@ -229,11 +227,13 @@
   font-size: 13px;
 }
 
+/*כפתור המחיקה*/
 .todo-btn.small.danger{
   border-color: rgba(239,68,68,0.35);
   color: var(--danger);
 }
 
+/*המצב שבו אין משימות כלל*/
 .todo-empty{
   padding: 14px;
   border: 1px dashed var(--border);

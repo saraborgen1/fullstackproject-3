@@ -58,3 +58,10 @@ html, body { margin: 0; padding: 0; }
   color: var(--danger);
   font-size: 13px;
 }
+
+/*אפקט פוקוס לשדות הקלט*/
+.auth-field:focus, .todo-input:focus{
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 4px rgba(42, 167, 255, 0.18);
+}
+

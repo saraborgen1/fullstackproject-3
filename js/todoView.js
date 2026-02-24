@@ -55,7 +55,6 @@ export function renderTodoApp(root, network) {
             <p id="errorBox" class="todo-msg"></p>
             <ul id="todoList" class="todo-list"></ul>
         </div>
-
       </div>
     </div>
   </div>
@@ -76,6 +75,14 @@ export function renderTodoApp(root, network) {
   const tabScheduled = document.getElementById("tabScheduled");
   const tabAll = document.getElementById("tabAll");
   const tabDone = document.getElementById("tabDone");
+
+  function updateClearButtonVisibility() {
+    if (currentCategory === "done") {
+      clearDoneBtn.style.display = "inline-flex";
+    } else {
+      clearDoneBtn.style.display = "none";
+    }
+  }
 
   let currentCategory = "all"; 
 
@@ -285,7 +292,10 @@ export function renderTodoApp(root, network) {
           "DELETE",
           `/todos/${t.id}`,
           { owner: currentUser },
-          loadTodos
+            () => {
+              showMessage("Task deleted successfully", "success");
+              loadTodos();
+            }
         );
       };
 
@@ -382,27 +392,32 @@ export function renderTodoApp(root, network) {
   tabToday.onclick = () => {
     currentCategory = "today";
     setActiveTab();
+    updateClearButtonVisibility();
     loadTodos();
   };
 
   tabScheduled.onclick = () => {
     currentCategory = "scheduled";
     setActiveTab();
+    updateClearButtonVisibility();
     loadTodos();
   };
 
   tabAll.onclick = () => {
     currentCategory = "all";
     setActiveTab();
+    updateClearButtonVisibility();
     loadTodos();
   };
 
   tabDone.onclick = () => {
     currentCategory = "done";
     setActiveTab();
+    updateClearButtonVisibility();
     loadTodos();
   };
 
   setActiveTab();
+  updateClearButtonVisibility();
   loadTodos();
 }
