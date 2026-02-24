@@ -1,5 +1,4 @@
 //servers/authServer.js
-
 import { UsersDb } from "../DB/usersDb.js";
 
 export class AuthServer {

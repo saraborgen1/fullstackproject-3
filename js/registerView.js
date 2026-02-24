@@ -1,5 +1,4 @@
 //js/registerView.js
-
 import { FXMLHttpRequest } from "../fajax.js";
 
 export function renderRegister(root, network) {

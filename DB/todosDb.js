@@ -1,5 +1,4 @@
 //DB/todosDb.js
-
 export class TodosDb {
 
   constructor() {
@@ -249,7 +248,6 @@ export class TodosDb {
       }
       list = list.filter(t => t.done === done);
     }
-
     return list;
   }
 }

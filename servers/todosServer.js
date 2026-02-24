@@ -1,5 +1,4 @@
 //servers/todosServer.js
-
 import { TodosDb } from "../DB/todosDb.js";
 
 export class TodosServer {
@@ -16,6 +15,10 @@ export class TodosServer {
     const method = String(request.method || "").toUpperCase();
     const url = String(request.url || "");
     const body = request.body || {};
+    const headers = request.headers || {};
+    const authUser = (headers["x-user"] ?? headers["X-User"] ?? "").toString().trim();
+
+    if (!authUser) return { status: 401, data: { error: "Unauthorized" } };
 
     if (!method || !url.startsWith("/")) {
       return { status: 400, data: { error: "Bad request" } };
@@ -40,17 +43,11 @@ export class TodosServer {
       }
     }
 
-    if (method === "GET" && parts.length === 1 && query.owner) {
-      return { status: 200, data: this.db.getByOwner(query.owner) };
-    } 
-    
     if (method === "GET" && parts.length === 1) {
-      return { status: 200, data: this.db.getAll() };
-    }
+      return { status: 200, data: this.db.getByOwner(authUser) };
+    } 
 
     if (method === "GET" && parts.length === 2 && parts[1] === "search") {
-      if (!query.owner) return { status: 400, data: { error: "owner is required" } };
-
       let done = undefined;
       if (query.done !== undefined) {
         if (query.done === "true") done = true;
@@ -59,7 +56,7 @@ export class TodosServer {
       }
 
       const q = query.q || "";
-      const result = this.db.search(query.owner, q, done);
+      const result = this.db.search(authUser, q, done);
       return { status: 200, data: result };
     }
 
@@ -70,37 +67,37 @@ export class TodosServer {
     }
 
     if (method === "GET" && parts.length === 2) {
-      if (!query.owner) return { status: 400, data: { error: "owner is required" } };
       if (id === null) return { status: 400, data: { error: "invalid id" } };
 
-      const todo = this.db.getById(query.owner, id);
+      const todo = this.db.getById(authUser, id);
+
       if (!todo) return { status: 404, data: { error: "todo not found" } };
       return { status: 200, data: todo };
     }
+
     if (method === "POST" && parts.length === 1) {
       try {
-        const created = this.db.add(body.owner, body.title, body.dueDate);
+        const created = this.db.add(authUser, body.title, body.dueDate);
 
         return { status: 201, data: created };
       } catch (e) {
         return { status: 400, data: { error: e.message || "bad input" } };
       }
     }
+
     if (method === "PUT" && parts.length === 3 && parts[2] === "toggle") {
       if (id === null) return { status: 400, data: { error: "invalid id" } };
-      if (!body.owner) return { status: 400, data: { error: "owner is required" } };
 
-      const updated = this.db.toggle(body.owner, id);
+      const updated = this.db.toggle(authUser, id);
       if (!updated) return { status: 404, data: { error: "todo not found" } };
       return { status: 200, data: updated };
     }
 
     if (method === "PUT" && parts.length === 2) {
       if (id === null) return { status: 400, data: { error: "invalid id" } };
-      if (!body.owner) return { status: 400, data: { error: "owner is required" } };
 
       try {
-        const updated = this.db.update(body.owner, id, { title: body.title, done: body.done, dueDate: body.dueDate });
+        const updated = this.db.update(authUser, id, { title: body.title, done: body.done, dueDate: body.dueDate });
         if (!updated) return { status: 404, data: { error: "todo not found" } };
         return { status: 200, data: updated };
       } catch (e) {
@@ -110,9 +107,8 @@ export class TodosServer {
 
     if (method === "DELETE" && parts.length === 2) {
       if (id === null) return { status: 400, data: { error: "invalid id" } };
-      if (!body.owner) return { status: 400, data: { error: "owner is required" } };
 
-      const ok = this.db.remove(body.owner, id);
+      const ok = this.db.remove(authUser, id);
       if (!ok) return { status: 404, data: { error: "todo not found" } };
       return { status: 200, data: { deleted: true } };
     }

@@ -1,5 +1,4 @@
 //DB/usersDb.js
-
 export class UsersDb {
 
   constructor() {
@@ -34,19 +33,25 @@ export class UsersDb {
   }
 
  addUser(username, password, email, phone) {
-    const u = String(username ?? "").trim();
+   const u = String(username ?? "").trim();
+    if (!u) throw new Error("username is required");
+
     if (this.findByUsername(u)) {
       throw new Error("User already exists");
     }
 
     const users = this.getAll();
+    const ids = users.map(x => Number(x.id)).filter(n => Number.isInteger(n) && n > 0);
+    const nextId = ids.length === 0 ? 1 : Math.max(...ids) + 1;
+
     const newUser = {
+      id: nextId,
       username: u,
       password: password,
       email: String(email ?? "").trim(),
       phone: String(phone ?? "").trim()
     };
-    
+
     users.push(newUser);
     this.saveAll(users);
     return newUser;

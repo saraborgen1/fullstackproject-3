@@ -1,5 +1,4 @@
 // fajax.js
-
 export class FXMLHttpRequest {
 
   constructor(network) {
@@ -14,12 +13,20 @@ export class FXMLHttpRequest {
     this.timeout = 4000;   
     this.onreadystatechange = null;
     this._timeoutId = null;
+    this._timedOut = false;
   }
 
   open(method, url) {
     this.method = method;
     this.url = url;
-    this.readyState = 1; 
+    this.readyState = 1;
+    this.status = 0;
+    this.response = null;
+
+    if (this._timeoutId) {
+      clearTimeout(this._timeoutId);
+      this._timeoutId = null;
+    }
 
     if (this.onreadystatechange) {
       this.onreadystatechange();
@@ -31,6 +38,7 @@ export class FXMLHttpRequest {
   }
 
   send(body = null) {
+    this._timedOut = false;
     this.body = body;
     this.readyState = 2; 
 
@@ -41,6 +49,7 @@ export class FXMLHttpRequest {
     const requestId = Date.now() + Math.random();
 
     this._timeoutId = setTimeout(() => {
+      this._timedOut = true;
       this.readyState = 4;
       this.status = 0;
       this.response = {
@@ -64,14 +73,13 @@ export class FXMLHttpRequest {
       },
       (response) => {
 
-        if (this.readyState === 4 && this.status === 0) {
-          return;
-        }
+        if (this._timedOut) return;
 
         clearTimeout(this._timeoutId);
 
         this.readyState = 4;
-        this.status = response.ok ? 200 : 404;
+        this.status = typeof response.status !== "undefined"
+          ? Number(response.status) : (response.ok ? 200 : 400);
         this.response = response;
 
         if (this.onreadystatechange) {

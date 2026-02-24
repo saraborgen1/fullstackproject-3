@@ -1,5 +1,4 @@
 //network.js
-
 export class Network {
   constructor() {
     this.routes = [];
@@ -28,10 +27,7 @@ export class Network {
       return;
     }
 
-    // Random dropRate every request: 0.1 - 0.5
-    //const dropRate = Math.random() * (0.5 - 0.1) + 0.1;
     const dropRate = 0.1;
-    // Random delay every request: 1000 - 3000 ms
     const delay = Math.floor(Math.random() * (3000 - 1000 + 1)) + 1000;
     const dropped = Math.random() < dropRate;
 
@@ -81,7 +77,6 @@ export class Network {
           );
         }
 
-      
         if (serverRes && typeof serverRes === "object" && "ok" in serverRes) {
           if (requestId !== undefined) {
             if (!serverRes.meta) serverRes.meta = {};
@@ -90,8 +85,7 @@ export class Network {
           callback(serverRes);
           return;
         }
-
-        
+ 
         if (serverRes && typeof serverRes === "object" && "status" in serverRes) {
           const status = Number(serverRes.status);
           const data = serverRes.data;
@@ -115,7 +109,6 @@ export class Network {
           return;
         }
 
-     
         callback({
           ok: false,
           error: { code: "SERVER_ERROR", message: "Unknown server response format" },
@@ -129,7 +122,6 @@ export class Network {
           meta: requestId !== undefined ? { requestId } : {}
         });
       }
-
     }, delay);
   }
 }

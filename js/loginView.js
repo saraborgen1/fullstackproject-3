@@ -1,5 +1,4 @@
 // js/loginView.js
-
 import { FXMLHttpRequest } from "../fajax.js";
 
 export function renderLogin(root, network) {

@@ -2,7 +2,6 @@
 import { FXMLHttpRequest } from "../fajax.js";
 
 export function renderTodoApp(root, network) {
-
   const currentUser = localStorage.getItem("currentUser");
 
   if (!currentUser) {
@@ -162,14 +161,14 @@ export function renderTodoApp(root, network) {
         }
       }
     };
-
+    xhr.setRequestHeader("x-user", localStorage.getItem("currentUser"));
     xhr.send(body);
   }
 
   function loadTodos() {
    sendRequest(
         "GET",
-        `/todos?owner=${encodeURIComponent(currentUser)}`,
+        "/todos",
         null,
         (todos) => renderList(applyCategoryFilter(todos))
         );
@@ -236,7 +235,7 @@ export function renderTodoApp(root, network) {
         sendRequest(
           "PUT",
           `/todos/${t.id}/toggle`,
-          { owner: currentUser },
+          {},
           loadTodos
         );
       };
@@ -277,7 +276,6 @@ export function renderTodoApp(root, network) {
             "PUT",
             `/todos/${t.id}`,
             {
-            owner: currentUser,
             title: newTitle,
             done: t.done,
             dueDate
@@ -291,7 +289,7 @@ export function renderTodoApp(root, network) {
         sendRequest(
           "DELETE",
           `/todos/${t.id}`,
-          { owner: currentUser },
+          {},
             () => {
               showMessage("Task deleted successfully", "success");
               loadTodos();
@@ -320,11 +318,10 @@ export function renderTodoApp(root, network) {
       return;
     }
 
-
     sendRequest(
       "POST",
       "/todos",
-      { owner: currentUser, title: title, dueDate: dueDate || null },
+      {title: title, dueDate: dueDate || null },
       () => {
         titleInput.value = "";
         dueDateInput.value = "";
@@ -339,7 +336,7 @@ export function renderTodoApp(root, network) {
     const q = searchInput.value.trim();
     const done = filterSelect.value;
 
-    let url = `/todos/search?owner=${encodeURIComponent(currentUser)}`;
+    let url = `/todos/search`;
     if (q) url += `&q=${encodeURIComponent(q)}`;
     if (done !== "") url += `&done=${done}`;
 
@@ -365,7 +362,7 @@ export function renderTodoApp(root, network) {
   };
   
   clearDoneBtn.onclick = () => { 
-    sendRequest("GET", `/todos?owner=${encodeURIComponent(currentUser)}`, null, (todos) => {
+    sendRequest("GET", `/todos`, null, (todos) => {
         const doneTodos = (todos || []).filter(t => t.done === true);
 
         if (doneTodos.length === 0) {
@@ -383,7 +380,7 @@ export function renderTodoApp(root, network) {
         const id = doneTodos[i].id;
         i++;
 
-        sendRequest("DELETE", `/todos/${id}`, { owner: currentUser }, deleteNext);
+        sendRequest("DELETE", `/todos/${id}`, {}, deleteNext);
         };
         deleteNext();
     });

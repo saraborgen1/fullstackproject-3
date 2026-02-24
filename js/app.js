@@ -6,7 +6,6 @@ import { renderRegister } from "./registerView.js";
 import { renderTodoApp } from "./todoView.js"; 
 import { TodosServer } from "../servers/todosServer.js";
 
-
 export function startRouter(root, network) {
 
   function render() {
@@ -26,6 +25,7 @@ export function startRouter(root, network) {
   }
 
   window.addEventListener("hashchange", render);
+  window.addEventListener("load", render);
   render();
 }
 
