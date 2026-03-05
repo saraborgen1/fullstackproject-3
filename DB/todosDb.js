@@ -129,24 +129,6 @@ export class TodosDb {
     return todo;
   }
 
-  updateTitle(owner, id, newTitle) {
-    owner = String(owner ?? "").trim();
-    newTitle = String(newTitle ?? "").trim();
-
-    if (!owner) return null;
-    if (!Number.isInteger(id) || id <= 0) return null;
-    if (!newTitle) throw new Error("title is required");
-
-    const todos = this.getAll();
-    const todo = todos.find(t => t.owner === owner && t.id === id);
-
-    if (!todo) return null;
-
-    todo.title = newTitle;
-    this.saveAll(todos);
-    return todo;
-  }
-
   update(owner, id, patch) {
     owner = String(owner ?? "").trim();
 
@@ -204,18 +186,6 @@ export class TodosDb {
     const afterTodos = todos.filter(t => !(t.owner === owner && t.id === id));
     this.saveAll(afterTodos);
     return afterTodos.length !== before;
-  }
-
-  clearByOwner(owner) {
-    owner = String(owner ?? "").trim();
-
-    if (!owner) return 0;
-
-    const todos = this.getAll();
-    const before = todos.length;
-    const afterTodos = todos.filter(t => t.owner !== owner);
-    this.saveAll(afterTodos);
-    return before - afterTodos.length;
   }
 
   clearCompleted(owner) {

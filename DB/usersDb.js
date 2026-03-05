@@ -41,7 +41,7 @@ export class UsersDb {
     }
 
     const users = this.getAll();
-    const ids = users.map(x => Number(x.id)).filter(n => Number.isInteger(n) && n > 0);
+    const ids = users.map(x => Number(x.id));
     const nextId = ids.length === 0 ? 1 : Math.max(...ids) + 1;
 
     const newUser = {

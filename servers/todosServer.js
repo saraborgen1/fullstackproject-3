@@ -25,7 +25,7 @@ export class TodosServer {
     }
 
     const [path, queryString = ""] = url.split("?");
-    const parts = path.split("/").filter(Boolean); // e.g. "/todos/5/toggle" -> ["todos","5","toggle"]
+    const parts = path.split("/").filter(Boolean);
    
     if (parts[0] !== "todos") {
       return { status: 404, data: { error: "Not found" } };
