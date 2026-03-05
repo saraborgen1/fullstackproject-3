@@ -336,9 +336,15 @@ export function renderTodoApp(root, network) {
     const q = searchInput.value.trim();
     const done = filterSelect.value;
 
-    let url = `/todos/search`;
-    if (q) url += `&q=${encodeURIComponent(q)}`;
-    if (done !== "") url += `&done=${done}`;
+    let url = "/todos/search";
+    let params = [];
+
+    if (q) params.push("q=" + encodeURIComponent(q));
+    if (done !== "") params.push("done=" + encodeURIComponent(done));
+
+    if (params.length > 0) {
+      url += "?" + params.join("&");
+    }
 
     sendRequest("GET", url, null, (todos) => {
       const filtered = applyCategoryFilter(todos);
