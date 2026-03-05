@@ -11,10 +11,10 @@ html, body { margin: 0; padding: 0; }
   --primary:#2aa7ff;
   --primary2:#1d8fe0;
   --danger:#ef4444;
-  --cat1:#38bdf8;  /* today */
-  --cat2:#a78bfa;  /* scheduled */
-  --cat3:#22c55e;  /* all */
-  --cat4:#f59e0b;  /* done */
+  --cat1:#38bdf8;  
+  --cat2:#a78bfa;  
+  --cat3:#22c55e;  
+  --cat4:#f59e0b;  
 }
 
 .todo-page, .auth-container{
@@ -27,7 +27,7 @@ html, body { margin: 0; padding: 0; }
   background:
     radial-gradient(1200px 600px at 20% 10%, var(--bg1), transparent),
     radial-gradient(900px 500px at 80% 30%, #d9f0ff, transparent),
-    linear-gradient(180deg, var(--bg2), #ffffff);
+    linear-gradient(180deg, var(--bg2), var(--card));
 }
 
 .auth-card, .todo-card{
@@ -59,7 +59,6 @@ html, body { margin: 0; padding: 0; }
   font-size: 13px;
 }
 
-/*אפקט פוקוס לשדות הקלט*/
 .auth-field:focus, .todo-input:focus{
   border-color: #93c5fd;
   box-shadow: 0 0 0 4px rgba(42, 167, 255, 0.18);

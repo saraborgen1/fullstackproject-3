@@ -1,16 +1,13 @@
-/*כרטיסיה באמצע*/
 .auth-card{
   max-width: 460px;
   padding: 22px 18px;
 }
 
-/*כותרת ראשית*/
 .auth-title{
   line-height: 1.2;
   text-align: center;
 }
 
-/*כותרת משנית*/
 .auth-subtitle{
   margin: 0 0 18px 0;
   text-align: center;
@@ -18,7 +15,6 @@
   font-size: 14px;
 }
 
-/*עיצוב בסיסי לכרטיסיה*/
 .auth-form{
   display: flex;
   flex-direction: column;
@@ -39,7 +35,6 @@
   transition: border-color 160ms ease, box-shadow 160ms ease;
 }
 
-/*עיצוב כפתור ההתחברות והרישום*/
 .auth-btn{
   padding: 12px 14px;
   border: none;
@@ -56,7 +51,6 @@
   text-align: center;
 }
 
-/*טקסט תחתון*/
 .auth-footer{
   margin-top: 14px;
   text-align: center;
@@ -64,7 +58,6 @@
   font-size: 14px;
 }
 
-/*קישורים בטקסט התחתון*/
 .auth-footer a{
   color: var(--primary2);
   text-decoration: none;
