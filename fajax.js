@@ -12,8 +12,8 @@ export class FXMLHttpRequest {
     this.response = null;
     this.timeout = 4000;   
     this.onreadystatechange = null;
-    this._timeoutId = null;
-    this._timedOut = false;
+    this.timeoutId = null;
+    this.timedOut = false;
   }
 
   open(method, url) {
@@ -23,9 +23,9 @@ export class FXMLHttpRequest {
     this.status = 0;
     this.response = null;
 
-    if (this._timeoutId) {
-      clearTimeout(this._timeoutId);
-      this._timeoutId = null;
+    if (this.timeoutId) {
+      clearTimeout(this.timeoutId);
+      this.timeoutId = null;
     }
 
     if (this.onreadystatechange) {
@@ -38,7 +38,8 @@ export class FXMLHttpRequest {
   }
 
   send(body = null) {
-    this._timedOut = false;
+    
+    this.timedOut = false;
     this.body = body;
     this.readyState = 2; 
 
@@ -48,8 +49,8 @@ export class FXMLHttpRequest {
 
     const requestId = Date.now() + Math.random();
 
-    this._timeoutId = setTimeout(() => {
-      this._timedOut = true;
+    this.timeoutId = setTimeout(() => {
+      this.timedOut = true;
       this.readyState = 4;
       this.status = 0;
       this.response = {
@@ -73,9 +74,9 @@ export class FXMLHttpRequest {
       },
       (response) => {
 
-        if (this._timedOut) return;
+        if (this.timedOut) return;
 
-        clearTimeout(this._timeoutId);
+        clearTimeout(this.timeoutId);
 
         this.readyState = 4;
         this.status = typeof response.status !== "undefined"

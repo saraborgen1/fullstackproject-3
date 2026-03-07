@@ -1,6 +1,6 @@
 // js/loginView.js
-import { FXMLHttpRequest } from "../fajax.js";
 
+import { FXMLHttpRequest } from "../fajax.js";
 export function renderLogin(root, network) {
 
   root.innerHTML = `
@@ -34,9 +34,10 @@ export function renderLogin(root, network) {
   const errorBox = document.getElementById("login-error");
 
   function validateInputs() {
-    const isInvalid = !usernameInput.value.trim() || !passwordInput.value.trim();
+    const isInvalid = !usernameInput.value.trim() || !passwordInput.value;
     loginBtn.disabled = isInvalid;
   }
+
   usernameInput.addEventListener("input", validateInputs);
   passwordInput.addEventListener("input", validateInputs);
   validateInputs();
@@ -56,11 +57,6 @@ export function renderLogin(root, network) {
   loginBtn.addEventListener("click", () => {
     const username = usernameInput.value.trim();
     const password = passwordInput.value;
-
-    if (!username || !password) {
-      errorBox.textContent = "Please fill all fields";
-      return;
-    }
 
     errorBox.textContent = "";
     loginBtn.disabled = true;
@@ -85,5 +81,6 @@ export function renderLogin(root, network) {
       username: username,
       password: password
     });
+    
   });
 }

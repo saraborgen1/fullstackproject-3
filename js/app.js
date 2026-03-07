@@ -1,4 +1,5 @@
 //js/app.js
+
 import { Network } from "../network.js";
 import { AuthServer } from "../servers/authServer.js";
 import { renderLogin } from "./loginView.js";

@@ -28,11 +28,10 @@ export class Network {
     }
 
     const dropRate = 0.1;
-    const delay = Math.floor(Math.random() * (3000 - 1000 + 1)) + 1000;
     const dropped = Math.random() < dropRate;
+    const delay = Math.floor(Math.random() * (3000 - 1000 + 1)) + 1000;
 
     setTimeout(() => {
-      // simulate drop: do nothing (FAJAX timeout should handle it)
       if (dropped) return;
 
       const route = this.routes.find(r => url.startsWith(r.prefix));
@@ -58,24 +57,13 @@ export class Network {
           return;
         }
 
-        if (server.handle.length <= 1) {
-          // TodosServer style
-          serverRes = server.handle({
-            method: String(method).toUpperCase(),
-            url: String(url),
-            body: body || {},
-            headers: headers || {},
-            requestId
-          });
-        } else {
-          // AuthServer style
-          serverRes = server.handle(
-            String(method).toUpperCase(),
-            String(url),
-            body || {},
-            headers || {}
-          );
-        }
+        serverRes = server.handle({
+          method: String(method).toUpperCase(),
+          url: String(url),
+          body: body || {},
+          headers: headers || {},
+          requestId
+        });
 
         if (serverRes && typeof serverRes === "object" && "ok" in serverRes) {
           if (requestId !== undefined) {

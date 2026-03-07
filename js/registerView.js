@@ -43,6 +43,7 @@ export function renderRegister(root, network) {
     const isInvalid = !username || !password || !email || !phone;
     regBtn.disabled = isInvalid;
   }
+  
   usernameInput.addEventListener("input", validateRegisterInputs);
   passwordInput.addEventListener("input", validateRegisterInputs);
   emailInput.addEventListener("input", validateRegisterInputs);

@@ -74,6 +74,15 @@ export function renderTodoApp(root, network) {
   const tabScheduled = document.getElementById("tabScheduled");
   const tabAll = document.getElementById("tabAll");
   const tabDone = document.getElementById("tabDone");
+  let isBusy = false;
+  let latestListRequestId = 0;
+  let currentCategory = "all"; 
+  let msgTimer = null;
+
+  function releaseUiLock() {
+    isBusy = false;
+    setUiDisabled(false);
+  }
 
   function updateClearButtonVisibility() {
     if (currentCategory === "done") {
@@ -82,8 +91,6 @@ export function renderTodoApp(root, network) {
       clearDoneBtn.style.display = "none";
     }
   }
-
-  let currentCategory = "all"; 
 
   function todayYYYYMMDD() {
     const d = new Date();
@@ -133,8 +140,6 @@ export function renderTodoApp(root, network) {
     window.location.hash = "#/login";
   };
 
-  let msgTimer = null;
-
   function showMessage(msg, type = "error") {
     errorBox.textContent = msg || "";
     errorBox.className = type === "success" ? "todo-msg success" : "todo-msg error";
@@ -144,34 +149,67 @@ export function renderTodoApp(root, network) {
       msgTimer = setTimeout(() => {
         errorBox.textContent = "";
         errorBox.className = "todo-msg";
-      }, 1800);
+      }, 2000);
     }
   }
 
-  function sendRequest(method, url, body, onSuccess) {
-    const xhr = new FXMLHttpRequest(network);
-    xhr.open(method, url);
+  function setUiDisabled(disabled) {
+    addBtn.disabled = disabled;
+    searchBtn.disabled = disabled;
+    refreshBtn.disabled = disabled;
+    clearDoneBtn.disabled = disabled;
+    titleInput.disabled = disabled;
+    searchInput.disabled = disabled;
+    filterSelect.disabled = disabled;
+    dueDateInput.disabled = disabled;
+  }
 
+  function sendRequest(method, url, body, onSuccess, options = {}, onError = null) {
+    const { lockUi = true, requestTag = null } = options;
+    if (lockUi && isBusy) return;
+
+    const xhr = new FXMLHttpRequest(network);
+    if (lockUi) {
+      isBusy = true;
+      setUiDisabled(true);
+    }
+
+    xhr.open(method, url);
     xhr.onreadystatechange = function () {
-      if (xhr.readyState === 4) {
-        if (!xhr.response.ok) {
-          showMessage(xhr.response?.error?.message || xhr.response?.error || "Server error", "error");
-        } else {
-          if (onSuccess) onSuccess(xhr.response.data);
-        }
+      if (xhr.readyState !== 4) return;
+
+      if (lockUi) {
+        isBusy = false;
+        setUiDisabled(false);
       }
+
+      if (!xhr.response || !xhr.response.ok) {
+        showMessage(xhr.response?.error?.message || xhr.response?.error || "Server error", "error");
+        if (onError) onError(xhr.response);
+        return;
+      }
+
+      if (requestTag !== null && requestTag !== latestListRequestId) {
+        return;
+      }
+
+      if (onSuccess) onSuccess(xhr.response.data);
     };
+      
     xhr.setRequestHeader("x-user", localStorage.getItem("currentUser"));
     xhr.send(body);
   }
 
   function loadTodos() {
+    const requestId = ++latestListRequestId;
+
    sendRequest(
         "GET",
         "/todos",
         null,
-        (todos) => renderList(applyCategoryFilter(todos))
-        );
+        (todos) => renderList(applyCategoryFilter(todos)),
+        { lockUi: false, requestTag: requestId }
+      );
 
   }
 
@@ -255,7 +293,6 @@ export function renderTodoApp(root, network) {
         if (trimmed) {
           const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
 
-          // בדיקת פורמט
           if (!dateRegex.test(trimmed)) {
             showMessage("Due date must be in format YYYY-MM-DD", "error");
             return;
@@ -263,7 +300,6 @@ export function renderTodoApp(root, network) {
 
           const today = todayYYYYMMDD();
 
-          // בדיקה שהתאריך אינו בעבר (היום מותר)
           if (trimmed < today) {
             showMessage("Due date cannot be in the past", "error");
             return;
@@ -344,19 +380,21 @@ export function renderTodoApp(root, network) {
 
     if (params.length > 0) {
       url += "?" + params.join("&");
-    }
+    } 
+
+    const requestId = ++latestListRequestId;
 
     sendRequest("GET", url, null, (todos) => {
       const filtered = applyCategoryFilter(todos);
-
       if (!filtered || filtered.length === 0) {
         showMessage("No results found", "error");
       } else {
         showMessage("", "success");
       }
-
       renderList(filtered);
-    });
+      },
+      { lockUi: false, requestTag: requestId }
+    );
   };
 
   // Refresh
@@ -367,28 +405,47 @@ export function renderTodoApp(root, network) {
     loadTodos();
   };
   
+  // Clear Completed
   clearDoneBtn.onclick = () => { 
+    if (isBusy) return;
+    isBusy = true;
+    setUiDisabled(true);
+
     sendRequest("GET", `/todos`, null, (todos) => {
-        const doneTodos = (todos || []).filter(t => t.done === true);
+      const doneTodos = (todos || []).filter(t => t.done === true);
 
-        if (doneTodos.length === 0) {
+      if (doneTodos.length === 0) {
         showMessage("No completed tasks to clear", "error");
+        releaseUiLock();
         return;
-        }
+      }
 
-        let i = 0;
-        const deleteNext = () => {
+      let i = 0;
+      const deleteNext = () => {
         if (i >= doneTodos.length) {
-            loadTodos();
-            return;
+          releaseUiLock();
+          loadTodos();
+          return;
         }
 
         const id = doneTodos[i].id;
         i++;
 
-        sendRequest("DELETE", `/todos/${id}`, {}, deleteNext);
-        };
-        deleteNext();
+        sendRequest(
+            "DELETE",
+           `/todos/${id}`,
+            {},
+            deleteNext,
+            { lockUi: false },
+            () => {
+              releaseUiLock();
+            }
+          );
+      };
+      deleteNext();},
+    { lockUi: false },
+    () => {
+      releaseUiLock();
     });
   };
   
